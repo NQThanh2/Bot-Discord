@@ -2,6 +2,7 @@ import { Client, GatewayIntentBits, Events, Collection } from 'discord.js';
 import { config } from '../config.js';
 import { loadCommands } from './handlers/loadCommands.js';
 import { startReminderScheduler } from './handlers/reminderScheduler.js';
+import { startKeepAliveServer } from './handlers/keepAlive.js';
 
 if (!config.token || !config.clientId) {
   process.exit(1);
@@ -55,6 +56,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 });
 
 async function main() {
+  startKeepAliveServer(); // chi mo khi co bien PORT (Render Web Service)
   const commands = await loadCommands();
   for (const [name, command] of commands) {
     client.commands.set(name, command);

@@ -1,0 +1,19 @@
+# Blueprint Render - tu dong tao service khi ban "New + > Blueprint" va tro toi repo nay.
+# Mac dinh dung Web Service (chay duoc free tier nho keep-alive server).
+services:
+  - type: web
+    name: discord-bot
+    runtime: node
+    plan: free
+    # Build: cai package + dang ky slash command (env var co san luc build tren Render)
+    buildCommand: npm install && npm run deploy
+    startCommand: npm start
+    # Render se thay /health luon tra 200 -> coi service la khoe manh
+    healthCheckPath: /health
+    envVars:
+      - key: DISCORD_TOKEN
+        sync: false   # tu nhap trong dashboard, KHONG commit token
+      - key: CLIENT_ID
+        sync: false
+      - key: GUILD_ID
+        sync: false   # de trong de deploy lenh global
