@@ -102,33 +102,39 @@ Bot Discord chạy nền liên tục nên có 2 cách:
 
 > Background Worker không cần cổng HTTP nên đúng bản chất bot nhất.
 
-### Cách B — Web Service (dùng được FREE tier)
+### Cách B — Web Service (dùng được FREE tier) ⭐
+
+**Bước 1 — Tạo Upstash Redis (để reminder không mất khi restart):**
+1. Vào https://console.upstash.com → đăng nhập (không cần thẻ).
+2. **Create Database** → đặt tên, chọn region gần (vd Singapore) → Create.
+3. Mở tab **REST API**, copy 2 giá trị: `UPSTASH_REDIS_REST_URL` và `UPSTASH_REDIS_REST_TOKEN`.
+
+**Bước 2 — Tạo service trên Render:**
 1. Push code lên GitHub.
-2. Render Dashboard → **New + → Web Service** → chọn repo. (Hoặc dùng **Blueprint** trỏ tới `render.yaml` có sẵn trong repo.)
+2. Render Dashboard → **New + → Web Service** → chọn repo. (Hoặc **Blueprint** trỏ tới `render.yaml` có sẵn.)
 3. Điền:
    - **Root Directory**: để trống
    - **Build Command**: `npm install && npm run deploy`
    - **Start Command**: `npm start`
    - **Health Check Path**: `/health`
-4. Thêm biến môi trường như trên.
+4. Tab **Environment** → thêm: `DISCORD_TOKEN`, `CLIENT_ID`, `GUILD_ID` (để trống = global), `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`.
 
-Code đã có sẵn HTTP keep-alive server (`src/handlers/keepAlive.js`): khi Render cấp biến `PORT`, bot tự mở cổng trả `200` để Render không báo lỗi.
+> Code đã có HTTP keep-alive server (`src/handlers/keepAlive.js`): khi Render cấp biến `PORT`, bot tự mở cổng trả `200` ở `/health` để Render không báo lỗi.
+> Khi có 2 biến Upstash, bot tự lưu reminder vào Redis (`src/utils/store.js`) → **không mất khi restart/redeploy**.
 
-> ⚠️ **Free Web Service ngủ sau 15 phút không có request** → bot mất kết nối, nhắc nhở không chạy. Khắc phục: dùng dịch vụ ping miễn phí (UptimeRobot, cron-job.org) gọi URL `https://<ten-app>.onrender.com/health` mỗi ~10 phút để giữ bot thức.
+**Bước 3 — Giữ bot thức (quan trọng với free tier):**
+Free Web Service **ngủ sau 15 phút** không có request → bot mất kết nối, nhắc nhở không chạy.
+→ Dùng dịch vụ ping miễn phí (**UptimeRobot** hoặc **cron-job.org**) gọi URL
+`https://<ten-app>.onrender.com/health` mỗi **~10 phút** để giữ bot thức.
 
-### ⚠️ Lưu ý quan trọng: ổ đĩa Render bị xoá khi redeploy/restart
-Reminder lưu trong `src/data/reminders.json`. Trên Render, filesystem là **ephemeral** — mỗi lần deploy lại hoặc restart, file này **mất sạch** → reminder đang chờ sẽ bị xoá.
-- **Free tier**: chấp nhận hạn chế này, hoặc đổi sang lưu bằng dịch vụ ngoài (vd Redis/Postgres miễn phí của Render, hoặc Supabase).
-- **Trả phí**: gắn **Persistent Disk** (Render) mount vào `src/data` để giữ dữ liệu.
-
-### Tóm tắt các ô cần điền trên Render
+### Tóm tắt các ô cần điền trên Render (free tier)
 | Ô | Giá trị |
 |---|---------|
 | Root Directory | *(để trống)* |
 | Build Command | `npm install && npm run deploy` |
 | Start Command | `npm start` |
-| Health Check Path (Web Service) | `/health` |
-| Env vars | `DISCORD_TOKEN`, `CLIENT_ID`, `GUILD_ID` |
+| Health Check Path | `/health` |
+| Env vars | `DISCORD_TOKEN`, `CLIENT_ID`, `GUILD_ID`, `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` |
 
 ## Ghi chú
 - Reminder lưu trong `src/data/reminders.json`. Với quy mô lớn nên đổi sang database (SQLite/Postgres).

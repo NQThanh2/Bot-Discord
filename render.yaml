@@ -17,3 +17,7 @@ services:
         sync: false
       - key: GUILD_ID
         sync: false   # de trong de deploy lenh global
+      - key: UPSTASH_REDIS_REST_URL
+        sync: false   # lay tu Upstash -> tab REST API
+      - key: UPSTASH_REDIS_REST_TOKEN
+        sync: false
