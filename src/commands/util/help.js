@@ -13,9 +13,10 @@ export async function execute(interaction) {
       {
         name: '⏰ Nhac nho',
         value:
-          '`/remind thoi_gian noi_dung` - Dat nhac (vd: `10m`, `2h`, `1d`)\n' +
+          '`/remind thoi_gian noi_dung` - Nhac 1 lan (vd: `10m`, `2h`, `1d`)\n' +
+          '`/dailyremind gio noi_dung` - Nhac LAP LAI moi ngay (vd: `7:00`)\n' +
           '`/reminders` - Xem cac nhac nho cua ban\n' +
-          '`/delremind ma` - Xoa 1 nhac nho',
+          '`/delremind ma` - Xoa / tat 1 nhac nho',
       },
       {
         name: '🎮 Mini game',

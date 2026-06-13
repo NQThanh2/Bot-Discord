@@ -24,6 +24,43 @@ export function parseDuration(input) {
 }
 
 /**
+ * Phan tich gio trong ngay dang "HH:MM" (24 gio). Vi du "7:00", "21:30".
+ * Tra ve { hour, minute } hoac null neu khong hop le.
+ */
+export function parseTimeOfDay(input) {
+  if (!input || typeof input !== 'string') return null;
+  const m = input.trim().match(/^(\d{1,2}):(\d{2})$/);
+  if (!m) return null;
+  const hour = parseInt(m[1], 10);
+  const minute = parseInt(m[2], 10);
+  if (hour < 0 || hour > 23 || minute < 0 || minute > 59) return null;
+  return { hour, minute };
+}
+
+/**
+ * Tinh moc thoi gian (timestamp ms, theo UTC) cho lan ke tiep dat gio HH:MM
+ * theo mui gio offsetHours (vd VN = +7). Neu hom nay da qua gio do thi lay ngay mai.
+ */
+export function computeNextDailyTrigger(hour, minute, offsetHours) {
+  const offsetMs = offsetHours * 3600000;
+  const now = Date.now();
+  // Doi "now" sang gio dia phuong de doc dung ngay/thang theo mui gio do
+  const local = new Date(now + offsetMs);
+  const targetLocal = Date.UTC(
+    local.getUTCFullYear(),
+    local.getUTCMonth(),
+    local.getUTCDate(),
+    hour,
+    minute,
+    0,
+    0
+  );
+  let triggerUtc = targetLocal - offsetMs; // doi nguoc ve UTC
+  if (triggerUtc <= now) triggerUtc += 86400000; // da qua -> ngay mai
+  return triggerUtc;
+}
+
+/**
  * Dinh dang khoang thoi gian (ms) thanh chuoi de doc: "1 ngay 2 gio 3 phut".
  */
 export function formatDuration(ms) {

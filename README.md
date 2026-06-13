@@ -57,9 +57,10 @@ Bất kỳ ai có quyền **Manage Server** trên server của họ đều có t
 
 | Lệnh | Chức năng |
 |------|-----------|
-| `/remind <thời_gian> <nội_dung>` | Đặt nhắc nhở (vd `10m`, `2h`, `1d`, `1h30m`) |
+| `/remind <thời_gian> <nội_dung>` | Nhắc 1 lần (vd `10m`, `2h`, `1d`, `1h30m`) |
+| `/dailyremind <giờ> <nội_dung>` | Nhắc lặp lại mỗi ngày vào giờ cố định (vd `7:00`, `21:30`) |
 | `/reminders` | Xem các nhắc nhở của bạn |
-| `/delremind <mã>` | Xoá 1 nhắc nhở |
+| `/delremind <mã>` | Xoá / tắt 1 nhắc nhở |
 | `/coinflip` | Tung đồng xu |
 | `/dice [mặt] [số_lượng]` | Tung xúc xắc |
 | `/rps` | Oẳn tù tì (kéo búa bao) |

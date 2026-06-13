@@ -4,6 +4,8 @@ export const config = {
   token: process.env.DISCORD_TOKEN,
   clientId: process.env.CLIENT_ID,
   guildId: process.env.GUILD_ID || null,
+  // Mui gio cho nhac hang ngay. VN = +7. Doi qua bien TZ_OFFSET_HOURS neu can.
+  tzOffsetHours: Number(process.env.TZ_OFFSET_HOURS ?? 7),
 };
 
 // Kiem tra cau hinh bat buoc

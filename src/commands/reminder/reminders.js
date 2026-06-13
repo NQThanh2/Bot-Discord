@@ -18,7 +18,11 @@ export async function execute(interaction) {
 
   const lines = reminders.slice(0, 25).map((r) => {
     const when = `<t:${Math.floor(r.triggerAt / 1000)}:R>`;
-    return `\`${r.id}\` • ${when}\n> ${r.message}`;
+    if (r.repeat === 'daily') {
+      const hhmm = `${String(r.hour).padStart(2, '0')}:${String(r.minute).padStart(2, '0')}`;
+      return `\`${r.id}\` 🔁 **hang ngay ${hhmm}** (lan toi ${when})\n> ${r.message}`;
+    }
+    return `\`${r.id}\` 🔔 ${when}\n> ${r.message}`;
   });
 
   const embed = new EmbedBuilder()

@@ -1,14 +1,18 @@
 import { loadReminders, saveReminders } from '../utils/store.js';
+import { computeNextDailyTrigger } from '../utils/parseTime.js';
 
 /**
  * Bo lap lich nhac nho. Moi 15 giay quet 1 lan cac reminder den han va gui di.
- * Khi bot khoi dong lai, reminder van con (luu file) nen khong bi mat.
+ * - Reminder mot lan (once): gui xong thi xoa.
+ * - Reminder hang ngay (daily): gui xong tu dat lai cho ngay hom sau.
+ * Du lieu luu o store (file/Redis) nen khong mat khi bot restart.
  */
 const CHECK_INTERVAL = 15_000;
 
 async function deliver(client, reminder) {
+  const prefix = reminder.repeat === 'daily' ? '🔁' : '🔔';
   const content =
-    `🔔 <@${reminder.userId}> Nhac nho cua ban:\n> ${reminder.message}`;
+    `${prefix} <@${reminder.userId}> Nhac nho cua ban:\n> ${reminder.message}`;
 
   try {
     // Uu tien gui vao dung kenh da dat lenh; neu khong duoc thi gui DM.
@@ -30,16 +34,28 @@ export function startReminderScheduler(client) {
     if (!reminders.length) return;
 
     const now = Date.now();
-    const due = reminders.filter((r) => r.triggerAt <= now);
-    if (!due.length) return;
+    if (!reminders.some((r) => r.triggerAt <= now)) return;
 
-    for (const reminder of due) {
+    const next = [];
+    for (const reminder of reminders) {
+      if (reminder.triggerAt > now) {
+        next.push(reminder);
+        continue;
+      }
       await deliver(client, reminder);
+      if (reminder.repeat === 'daily') {
+        // Tinh lai moc cho ngay hom sau (du bot offline lau van khong gui don)
+        reminder.triggerAt = computeNextDailyTrigger(
+          reminder.hour,
+          reminder.minute,
+          reminder.offsetHours ?? 7
+        );
+        next.push(reminder);
+      }
+      // reminder mot lan -> khong day vao next -> bi xoa
     }
 
-    // Loai bo cac reminder da gui
-    const remaining = reminders.filter((r) => r.triggerAt > now);
-    await saveReminders(remaining);
+    await saveReminders(next);
   };
 
   // Chay ngay 1 lan luc khoi dong (bat cac reminder qua han khi bot offline)
