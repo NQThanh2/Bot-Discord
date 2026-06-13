@@ -15,6 +15,7 @@ export async function execute(interaction) {
         value:
           '`/remind thoi_gian noi_dung` - Nhac 1 lan (vd: `10m`, `2h`, `1d`)\n' +
           '`/dailyremind gio noi_dung` - Nhac LAP LAI moi ngay (vd: `7:00`)\n' +
+          '`/announce gio noi_dung` - Thong bao @everyone theo lich *(chi Quan tri)*\n' +
           '`/reminders` - Xem cac nhac nho cua ban\n' +
           '`/delremind ma` - Xoa / tat 1 nhac nho',
       },

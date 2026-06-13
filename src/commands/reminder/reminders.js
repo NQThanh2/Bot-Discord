@@ -18,8 +18,16 @@ export async function execute(interaction) {
 
   const lines = reminders.slice(0, 25).map((r) => {
     const when = `<t:${Math.floor(r.triggerAt / 1000)}:R>`;
+    const hhmm =
+      r.hour != null
+        ? `${String(r.hour).padStart(2, '0')}:${String(r.minute).padStart(2, '0')}`
+        : null;
+
+    if (r.target === 'everyone') {
+      const lap = r.repeat === 'daily' ? `hang ngay ${hhmm}` : `mot lan ${hhmm}`;
+      return `\`${r.id}\` 📢 **@everyone ${lap}** (lan toi ${when})\n> ${r.message}`;
+    }
     if (r.repeat === 'daily') {
-      const hhmm = `${String(r.hour).padStart(2, '0')}:${String(r.minute).padStart(2, '0')}`;
       return `\`${r.id}\` 🔁 **hang ngay ${hhmm}** (lan toi ${when})\n> ${r.message}`;
     }
     return `\`${r.id}\` 🔔 ${when}\n> ${r.message}`;

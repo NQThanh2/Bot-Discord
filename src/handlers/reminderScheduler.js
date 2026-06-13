@@ -10,15 +10,29 @@ import { computeNextDailyTrigger } from '../utils/parseTime.js';
 const CHECK_INTERVAL = 15_000;
 
 async function deliver(client, reminder) {
-  const prefix = reminder.repeat === 'daily' ? '🔁' : '🔔';
-  const content =
-    `${prefix} <@${reminder.userId}> Nhac nho cua ban:\n> ${reminder.message}`;
-
   try {
-    // Uu tien gui vao dung kenh da dat lenh; neu khong duoc thi gui DM.
+    // Loai "thong bao toan server" -> ping @everyone trong kenh da dat.
+    if (reminder.target === 'everyone') {
+      const channel = await client.channels.fetch(reminder.channelId).catch(() => null);
+      if (!channel || !channel.isTextBased()) {
+        console.error(`[reminder] Khong tim thay kenh cho announce ${reminder.id}`);
+        return;
+      }
+      await channel.send({
+        content: `📢 @everyone\n> ${reminder.message}`,
+        allowedMentions: { parse: ['everyone'] },
+      });
+      return;
+    }
+
+    // Nhac ca nhan: gui vao kenh da dat; neu khong duoc thi gui DM.
+    const prefix = reminder.repeat === 'daily' ? '🔁' : '🔔';
+    const content = `${prefix} <@${reminder.userId}> Nhac nho cua ban:\n> ${reminder.message}`;
+    const allowedMentions = { users: [reminder.userId] };
+
     const channel = await client.channels.fetch(reminder.channelId).catch(() => null);
     if (channel && channel.isTextBased()) {
-      await channel.send({ content });
+      await channel.send({ content, allowedMentions });
       return;
     }
     const user = await client.users.fetch(reminder.userId);

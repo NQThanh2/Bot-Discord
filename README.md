@@ -46,12 +46,14 @@ npm run dev
 Thay `CLIENT_ID` bằng Application ID của bạn:
 
 ```
-https://discord.com/api/oauth2/authorize?client_id=CLIENT_ID&permissions=274877942784&scope=bot%20applications.commands
+https://discord.com/api/oauth2/authorize?client_id=CLIENT_ID&permissions=216064&scope=bot%20applications.commands
 ```
 
 Bất kỳ ai có quyền **Manage Server** trên server của họ đều có thể dùng link này để thêm bot vào.
 
-> Mẹo: Trong Developer Portal → **OAuth2 → URL Generator**, chọn scope `bot` + `applications.commands` và quyền `Send Messages`, `Embed Links` để tự sinh link.
+Quyền `216064` gồm: `View Channel`, `Send Messages`, `Embed Links`, `Read Message History`, `Mention Everyone` (cần cho `/announce` để ping @everyone).
+
+> Mẹo: Trong Developer Portal → **OAuth2 → URL Generator**, chọn scope `bot` + `applications.commands` và các quyền trên để tự sinh link.
 
 ## Danh sách lệnh
 
@@ -59,6 +61,7 @@ Bất kỳ ai có quyền **Manage Server** trên server của họ đều có t
 |------|-----------|
 | `/remind <thời_gian> <nội_dung>` | Nhắc 1 lần (vd `10m`, `2h`, `1d`, `1h30m`) |
 | `/dailyremind <giờ> <nội_dung>` | Nhắc lặp lại mỗi ngày vào giờ cố định (vd `7:00`, `21:30`) |
+| `/announce <giờ> <nội_dung> [lặp_lại] [kênh]` | Thông báo @everyone theo lịch — **chỉ Quản trị server (Manage Server)** |
 | `/reminders` | Xem các nhắc nhở của bạn |
 | `/delremind <mã>` | Xoá / tắt 1 nhắc nhở |
 | `/coinflip` | Tung đồng xu |
